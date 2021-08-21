@@ -4,16 +4,15 @@
         <input type="text" class="search__box" placeholder="Rechercher une ville .." v-model="query" @keyup.enter="sendLocation"> 
         <div class="weather__info">
         <div class="location">
-            <div class="adress">Westhouse</div>
+            <div class="adress">{{name}}</div>
             <div class="date">Today</div>
         </div>
         <div class="weather__physics">
-            <div class="temp">20°C</div>
-            <div class="weather">Sunny</div>
+            <div class="temp">{{temperature}}°C</div>
+            <div class="weather">{{weather}}</div>
         </div>
     </div>
-    </div>
-    
+    </div>   
 </div>
 </template>
 
@@ -25,21 +24,23 @@ export default {
             api_key :'9ff00bb0cab54b38ed820f677bfb69a4',
             api_url :'http://api.openweathermap.org/data/2.5/',
             query:'',
-            weather: {},
+            name : "Westhouse",
+            weather : "Sunny",
+            temperature : 25
         }
     },
     methods:{
         sendLocation(){
-            fetch(`${this.api_url}weather?q=${this.query}&units=metric&APPID${this.api_key}`)
-            .then(result => {
-                console.log(result);
-                let res = result.json();
-                console.log(res);
-                this.weather.name = res.name;
-                this.weather.weather = res.weather;
-                this.weather.temperatures = res.temperatures;
-            })
+            fetch(`http://api.openweathermap.org/data/2.5/weather?q=${this.query}&appid=${this.api_key}`)
+            .then(result => {return result.json()}
+            ).then(this.setResults)
             .catch(err => console.log(err))
+
+        },
+        setResults(results){
+            this.name = results.name;
+            this.weather = results.weather[0].description;
+            this.temperature = Math.round(results.main.temp -272.15)
         }
     }
     
