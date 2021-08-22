@@ -1,11 +1,12 @@
 <template>
-<div class="weather__box">
+<div class="weather__box" :class="{warm : temperature > 16}">
     <div class="shadow">
+        <div class="erreur"></div>
         <input type="text" class="search__box" placeholder="Rechercher une ville .." v-model="query" @keyup.enter="sendLocation"> 
         <div class="weather__info">
         <div class="location">
             <div class="adress">{{name}}</div>
-            <div class="date">Today</div>
+            <div class="date">{{getDate}}</div>
         </div>
         <div class="weather__physics">
             <div class="temp">{{temperature}}°C</div>
@@ -25,23 +26,38 @@ export default {
             api_url :'http://api.openweathermap.org/data/2.5/',
             query:'',
             name : "Westhouse",
-            weather : "Sunny",
+            weather : "Ensoleillé",
             temperature : 25
         }
     },
+    computed: {
+        getDate(){
+            let d = new Date();
+            let days = ["lundi", "mardi","mercredi","jeudi","vendredi","samedi","dimanche"]
+            let months = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"]
+            let date = days[d.getDay()] +" "+ d.getDate() +" "+ months[d.getMonth()] +" "+ d.getUTCFullYear()
+            return date
+        }
+    }
+    ,
     methods:{
         sendLocation(){
-            fetch(`http://api.openweathermap.org/data/2.5/weather?q=${this.query}&appid=${this.api_key}`)
-            .then(result => {return result.json()}
-            ).then(this.setResults)
-            .catch(err => console.log(err))
+            fetch(`http://api.openweathermap.org/data/2.5/weather?q=${this.query}&appid=${this.api_key}&lang=fr`)
+            .then(result => {return result.json()})
+            .then(this.setResults)
+            .catch(err => {
+                document.getElementsByClassName("erreur")[0].innerHTML = "Ville inconnue"
+                console.log(err)
+                })
 
         },
         setResults(results){
+            document.getElementsByClassName("erreur")[0].innerHTML = ""
             this.name = results.name;
             this.weather = results.weather[0].description;
             this.temperature = Math.round(results.main.temp -272.15)
-        }
+        },
+ 
     }
     
 }
@@ -54,12 +70,19 @@ export default {
     height: 500px;
     border: solid;
     border-radius: 20px;
-    box-shadow: 0 0 1000px 200px rgb(41, 153, 51);
+    box-shadow: 10px 10px  0px rgb(53, 137, 206);
     margin: 20px auto;
-    background-image: url('../assets/sunny.jpg');
+    background-image: url('../assets/cold.jpg');
     background-size: cover;
     background-position: bottom;
     transition: 0.4s;
+}
+
+.warm{
+    background-image: url('../assets/sunny.jpg');
+    box-shadow: 10px 10px  0px rgb(212, 64, 5);
+
+
 }
 
 .shadow{
@@ -68,6 +91,11 @@ export default {
     background-image: linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.75));
     border-radius: 20px;
     padding: 30px;
+}
+
+.erreur{
+    color: rgb(247, 111, 111);
+    font-weight: 800;
 }
 
 .search__box{
