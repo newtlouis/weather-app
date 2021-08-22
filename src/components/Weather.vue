@@ -1,5 +1,5 @@
 <template>
-<div class="weather__box" :class="{warm : temperature > 16}">
+<div class="weather__box" :class="{warm : temperature > 20}">
     <div class="shadow">
         <div class="erreur"></div>
         <input type="text" class="search__box" placeholder="Rechercher une ville .." v-model="query" @keyup.enter="sendLocation"> 
